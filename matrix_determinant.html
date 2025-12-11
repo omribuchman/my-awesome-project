@@ -1,0 +1,463 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>מחשבון דטרמיננטה של מטריצה</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+            color: #fff;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        .header p {
+            font-size: 1.1em;
+            opacity: 0.9;
+        }
+
+        .controls {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        }
+
+        .control-group {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
+        }
+
+        .control-group label {
+            font-size: 1.1em;
+            font-weight: 500;
+        }
+
+        .control-group input {
+            padding: 10px 15px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1em;
+            background: rgba(255, 255, 255, 0.2);
+            color: #fff;
+            width: 100px;
+            text-align: center;
+        }
+
+        .control-group input::placeholder {
+            color: rgba(255, 255, 255, 0.6);
+        }
+
+        .btn {
+            padding: 12px 30px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #fff;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        .btn:active {
+            transform: translateY(0);
+        }
+
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .matrix-container {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 30px;
+            margin-bottom: 20px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            overflow-x: auto;
+        }
+
+        .matrix {
+            display: inline-block;
+            margin: 20px 0;
+        }
+
+        .matrix-row {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+
+        .matrix-cell {
+            width: 80px;
+            padding: 12px;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.1);
+            color: #fff;
+            font-size: 1.1em;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+
+        .matrix-cell:focus {
+            outline: none;
+            border-color: #fff;
+            background: rgba(255, 255, 255, 0.2);
+            transform: scale(1.05);
+        }
+
+        .matrix-cell::placeholder {
+            color: rgba(255, 255, 255, 0.5);
+        }
+
+        .brackets {
+            font-size: 4em;
+            font-weight: bold;
+            color: rgba(255, 255, 255, 0.8);
+            line-height: 1;
+            padding: 0 10px;
+        }
+
+        .result-container {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 30px;
+            text-align: center;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            margin-top: 20px;
+        }
+
+        .result-label {
+            font-size: 1.2em;
+            margin-bottom: 15px;
+            opacity: 0.9;
+        }
+
+        .result-value {
+            font-size: 3em;
+            font-weight: bold;
+            color: #fff;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            display: inline-block;
+            min-width: 200px;
+        }
+
+        .steps-container {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 20px;
+            margin-top: 20px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        }
+
+        .steps-title {
+            font-size: 1.3em;
+            margin-bottom: 15px;
+            font-weight: 600;
+        }
+
+        .step {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 15px;
+            margin-bottom: 10px;
+            border-radius: 8px;
+            border-right: 4px solid #fff;
+        }
+
+        .error {
+            background: rgba(255, 0, 0, 0.2);
+            color: #ffcccc;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 15px;
+            border: 2px solid rgba(255, 0, 0, 0.5);
+        }
+
+        @media (max-width: 768px) {
+            .matrix-cell {
+                width: 60px;
+                padding: 8px;
+                font-size: 0.9em;
+            }
+
+            .brackets {
+                font-size: 2.5em;
+            }
+
+            .result-value {
+                font-size: 2em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🧮 מחשבון דטרמיננטה של מטריצה</h1>
+            <p>הזן מטריצה ריבועית וחשב את הדטרמיננטה שלה</p>
+        </div>
+
+        <div class="controls">
+            <div class="control-group">
+                <label>גודל המטריצה:</label>
+                <input type="number" id="matrixSize" min="1" max="10" value="3" onchange="createMatrix()">
+                <button class="btn btn-secondary" onclick="createMatrix()">צור מטריצה</button>
+                <button class="btn" onclick="calculateDeterminant()">חשב דטרמיננטה</button>
+                <button class="btn btn-secondary" onclick="clearMatrix()">נקה</button>
+                <button class="btn btn-secondary" onclick="fillRandom()">מלא אקראי</button>
+            </div>
+        </div>
+
+        <div class="matrix-container">
+            <div id="matrixDisplay"></div>
+        </div>
+
+        <div id="resultContainer" class="result-container" style="display: none;">
+            <div class="result-label">הדטרמיננטה היא:</div>
+            <div class="result-value" id="resultValue"></div>
+        </div>
+
+        <div id="stepsContainer" class="steps-container" style="display: none;">
+            <div class="steps-title">שלבי החישוב:</div>
+            <div id="stepsContent"></div>
+        </div>
+    </div>
+
+    <script>
+        let matrixSize = 3;
+        let matrix = [];
+
+        function createMatrix() {
+            matrixSize = parseInt(document.getElementById('matrixSize').value) || 3;
+            if (matrixSize < 1) matrixSize = 1;
+            if (matrixSize > 10) matrixSize = 10;
+            
+            matrix = [];
+            const display = document.getElementById('matrixDisplay');
+            display.innerHTML = '';
+
+            const matrixDiv = document.createElement('div');
+            matrixDiv.className = 'matrix';
+
+            // Opening bracket
+            const openBracket = document.createElement('span');
+            openBracket.className = 'brackets';
+            openBracket.textContent = '[';
+            matrixDiv.appendChild(openBracket);
+
+            const matrixTable = document.createElement('div');
+            matrixTable.style.display = 'flex';
+            matrixTable.style.flexDirection = 'column';
+            matrixTable.style.alignItems = 'center';
+
+            for (let i = 0; i < matrixSize; i++) {
+                const row = [];
+                const rowDiv = document.createElement('div');
+                rowDiv.className = 'matrix-row';
+
+                for (let j = 0; j < matrixSize; j++) {
+                    const cell = document.createElement('input');
+                    cell.type = 'text';
+                    cell.className = 'matrix-cell';
+                    cell.placeholder = '0';
+                    cell.value = '';
+                    cell.dataset.row = i;
+                    cell.dataset.col = j;
+                    cell.addEventListener('input', function() {
+                        updateMatrix();
+                    });
+                    rowDiv.appendChild(cell);
+                    row.push(0);
+                }
+
+                matrixTable.appendChild(rowDiv);
+                matrix.push(row);
+            }
+
+            matrixDiv.appendChild(matrixTable);
+
+            // Closing bracket
+            const closeBracket = document.createElement('span');
+            closeBracket.className = 'brackets';
+            closeBracket.textContent = ']';
+            matrixDiv.appendChild(closeBracket);
+
+            display.appendChild(matrixDiv);
+            updateMatrix();
+        }
+
+        function updateMatrix() {
+            const cells = document.querySelectorAll('.matrix-cell');
+            cells.forEach(cell => {
+                const row = parseInt(cell.dataset.row);
+                const col = parseInt(cell.dataset.col);
+                const value = parseFloat(cell.value) || 0;
+                matrix[row][col] = value;
+            });
+        }
+
+        function clearMatrix() {
+            const cells = document.querySelectorAll('.matrix-cell');
+            cells.forEach(cell => {
+                cell.value = '';
+            });
+            updateMatrix();
+            document.getElementById('resultContainer').style.display = 'none';
+            document.getElementById('stepsContainer').style.display = 'none';
+        }
+
+        function fillRandom() {
+            const cells = document.querySelectorAll('.matrix-cell');
+            cells.forEach(cell => {
+                const value = Math.floor(Math.random() * 21) - 10; // -10 to 10
+                cell.value = value;
+            });
+            updateMatrix();
+        }
+
+        function calculateDeterminant() {
+            updateMatrix();
+            
+            if (!isSquareMatrix()) {
+                showError('המטריצה חייבת להיות ריבועית!');
+                return;
+            }
+
+            const steps = [];
+            const determinant = computeDeterminant(matrix, steps);
+            
+            document.getElementById('resultValue').textContent = determinant;
+            document.getElementById('resultContainer').style.display = 'block';
+            
+            if (steps.length > 0) {
+                displaySteps(steps);
+            }
+        }
+
+        function isSquareMatrix() {
+            return matrix.length > 0 && matrix.length === matrix[0].length;
+        }
+
+        function computeDeterminant(mat, steps = []) {
+            const n = mat.length;
+
+            // Base case: 1x1 matrix
+            if (n === 1) {
+                steps.push(`מטריצה 1x1: det = ${mat[0][0]}`);
+                return mat[0][0];
+            }
+
+            // Base case: 2x2 matrix
+            if (n === 2) {
+                const det = mat[0][0] * mat[1][1] - mat[0][1] * mat[1][0];
+                steps.push(`מטריצה 2x2: det = (${mat[0][0]} × ${mat[1][1]}) - (${mat[0][1]} × ${mat[1][0]}) = ${det}`);
+                return det;
+            }
+
+            // Recursive case: use cofactor expansion along first row
+            let det = 0;
+            steps.push(`פירוק לפי שורה ראשונה (cofactor expansion):`);
+
+            for (let j = 0; j < n; j++) {
+                const minor = getMinor(mat, 0, j);
+                const cofactor = Math.pow(-1, 0 + j) * mat[0][j];
+                const minorDet = computeDeterminant(minor, steps);
+                const term = cofactor * minorDet;
+                
+                steps.push(`  C₀,${j} = (-1)⁽⁰⁺${j}⁾ × ${mat[0][j]} × det(Minor₀,${j}) = ${cofactor < 0 ? '' : '+'}${cofactor} × ${minorDet} = ${term}`);
+                det += term;
+            }
+
+            steps.push(`סה"כ: det = ${det}`);
+            return det;
+        }
+
+        function getMinor(mat, row, col) {
+            const minor = [];
+            for (let i = 0; i < mat.length; i++) {
+                if (i === row) continue;
+                const minorRow = [];
+                for (let j = 0; j < mat[i].length; j++) {
+                    if (j === col) continue;
+                    minorRow.push(mat[i][j]);
+                }
+                minor.push(minorRow);
+            }
+            return minor;
+        }
+
+        function displaySteps(steps) {
+            const container = document.getElementById('stepsContainer');
+            const content = document.getElementById('stepsContent');
+            content.innerHTML = '';
+
+            steps.forEach((step, index) => {
+                const stepDiv = document.createElement('div');
+                stepDiv.className = 'step';
+                stepDiv.textContent = step;
+                content.appendChild(stepDiv);
+            });
+
+            container.style.display = 'block';
+        }
+
+        function showError(message) {
+            const container = document.getElementById('resultContainer');
+            container.innerHTML = `<div class="error">${message}</div>`;
+            container.style.display = 'block';
+        }
+
+        // Initialize matrix on page load
+        createMatrix();
+    </script>
+</body>
+</html>
+
